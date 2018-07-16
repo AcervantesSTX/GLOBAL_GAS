@@ -1,0 +1,923 @@
+FORMAT: 1A
+HOST: https://globalgas.com
+
+# Global Gas - C4
+
+## DB.CAT_EMPLEADOS [/db.cat_empleados]
+
+### AGREGAR [POST]
+
+#### Acciones
+
+- INSERT INTO cat_empleados
+    - EMP_ID_GLOBALNET: PARAM.ID_GLOBALNET
+    - EMP_FECHA_ULTIMA_MODIFICACION: PARAM.FECHA_ULTIMA_MODIFICACION
+    - EMP_NOMBRE: PARAM.NOMBRE
+    - EMP_NUMERO: PARAM.NUMERO
+    - EMP_TELEFONO: PARAM.TELEFONO
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - ID_GLOBALNET
+    - FECHA_ULTIMA_MODIFICACION
+    - NOMBRE
+    - NUMERO
+    - TELEFONO
+
+### ACTUALIZAR [POST]
+
+#### Acciones
+
+- IF e_ID = QUERY - SELECT EMP_ID FROM cat_empleados WHERE EMP_ID_GLOBALNET=PARAM.ID_GLOBALNET
+    - UPDATE cat_empleados WHERE EMP_ID=e_ID
+        - EMP_FECHA_ULTIMA_MODIFICACION: PARAM.FECHA_ULTIMA_MODIFICACION
+        - EMP_NOMBRE: PARAM.NOMBRE
+        - EMP_NUMERO: PARAM.NUMERO
+        - EMP_TELEFONO: PARAM.TELEFONO
+    - RETURN FALSE
+- ELSE
+    - INSERT INTO cat_empleados
+        - EMP_ID_GLOBALNET: PARAM.ID_GLOBALNET
+        - EMP_FECHA_ULTIMA_MODIFICACION: PARAM.FECHA_ULTIMA_MODIFICACION
+        - EMP_NOMBRE: PARAM.NOMBRE
+        - EMP_NUMERO: PARAM.NUMERO
+        - EMP_TELEFONO: PARAM.TELEFONO
+    - RETURN TRUE
+
+#### Retorno
+
+- TRUE/FALSE
+
++ Attributes
+    - ID_GLOBALNET
+    - FECHA_ULTIMA_MODIFICACION
+    - NOMBRE
+    - NUMERO
+    - TELEFONO
+
+### ELIMINAR_TODOS [POST]
+
+#### Acciones
+
+- TRUNCATE TABLE cat_empleados
+
+#### Retorno
+
+- N/A
+
+## DB.CAT_EMPLEADOS_ACCESOS [/db.cat_empleados_accesos]
+
+### GENERAR_APIKEY [POST]
+
+#### Acciones
+
+- IF e_ID = QUERY - SELECT EMP_ACC_ID FROM cat_empleados_accesos WHERE EMP_ACC_NUMERO=PARAM.NUMERO
+    - UPDATE cat_empleados_accesos WHERE EMP_ACC_ID=e_ID
+        - EMP_ACC_APIKEY: Genera un codigo REGEX.APIKEY
+- ELSE
+    - INSERT INTO cat_empleados_accesos
+        - EMP_ACC_NUMERO: PARAM.NUMERO
+        - EMP_ACC_PERFIL: 'CHOFER'
+        - EMP_ACC_CONTRASENA: ''
+        - EMP_ACC_APIKEY: Genera un codigo REGEX.APIKEY
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - NUMERO
+
+## DB.CAT_UNIDADES [/db.cat_unidades]
+
+### AGREGAR [POST]
+
+#### Acciones
+
+- INSERT INTO cat_unidades
+    - UNI_ID_GLOBALNET: PARAM.ID_GLOBALNET
+    - UNI_FECHA_ULTIMA_MODIFICACION: PARAM.FECHA_ULTIMA_MODIFICACION
+    - UNI_NUMERO_ECONOMICO: PARAM.NUMERO_ECONOMICO
+    - UNI_CHOFER: PARAM.ID_CHOFER
+    - UNI_AYUDANTE: PARAM.ID_AYUDANTE
+    - UNI_AYUDANTE_2: PARAM.ID_AYUDANTE_2
+    - UNI_ID_RUTA: PARAM.ID_RUTA
+    - UNI_TIPO_UNIDAD: PARAM.TIPO_UNIDAD
+    - UNI_CUENTALITROS: PARAM.CUENTALITROS
+    - UNI_ROTOGAUGE: PARAM.ROTOGAUGE
+    - UNI_DOTACION: json_encode(PARAM.DOTACION)
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - ID_GLOBALNET
+    - FECHA_ULTIMA_MODIFICACION
+    - NUMERO_ECONOMICO
+    - ID_CHOFER
+    - ID_AYUDANTE
+    - ID_AYUDANTE_2
+    - ID_RUTA
+    - TIPO_UNIDAD
+    - CUENTALITROS
+    - ROTOGAUGE
+    - DOTACION
+        - CANTIDAD_10
+        - CANTIDAD_20
+        - CANTIDAD_30
+        - CANTIDAD_45
+
+### ACTUALIZAR [POST]
+
+#### Acciones
+
+- IF e_ID = QUERY - SELECT UNI_ID FROM cat_unidades WHERE UNI_ID_GLOBALNET=PARAM.ID_GLOBALNET
+    - UPDATE cat_unidades WHERE UNI_ID=e_ID
+        - UNI_FECHA_ULTIMA_MODIFICACION: PARAM.FECHA_ULTIMA_MODIFICACION
+        - UNI_NUMERO_ECONOMICO: PARAM.NUMERO_ECONOMICO
+        - UNI_CHOFER: PARAM.ID_CHOFER
+        - UNI_AYUDANTE: PARAM.ID_AYUDANTE
+        - UNI_AYUDANTE_2: PARAM.ID_AYUDANTE_2
+        - UNI_ID_RUTA: PARAM.ID_RUTA
+        - UNI_TIPO_UNIDAD: PARAM.TIPO_UNIDAD
+        - UNI_CUENTALITROS: PARAM.CUENTALITROS
+        - UNI_ROTOGAUGE: PARAM.ROTOGAUGE
+        - UNI_DOTACION: json_encode(PARAM.DOTACION)
+- ELSE
+    - INSERT INTO cat_empleados
+        - UNI_ID_GLOBALNET: PARAM.ID_GLOBALNET
+        - UNI_FECHA_ULTIMA_MODIFICACION: PARAM.FECHA_ULTIMA_MODIFICACION
+        - UNI_NUMERO_ECONOMICO: PARAM.NUMERO_ECONOMICO
+        - UNI_CHOFER: PARAM.ID_CHOFER
+        - UNI_AYUDANTE: PARAM.ID_AYUDANTE
+        - UNI_AYUDANTE_2: PARAM.ID_AYUDANTE_2
+        - UNI_ID_RUTA: PARAM.ID_RUTA
+        - UNI_TIPO_UNIDAD: PARAM.TIPO_UNIDAD
+        - UNI_CUENTALITROS: PARAM.CUENTALITROS
+        - UNI_ROTOGAUGE: PARAM.ROTOGAUGE
+        - UNI_DOTACION: json_encode(PARAM.DOTACION)
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - ID_GLOBALNET
+    - FECHA_ULTIMA_MODIFICACION
+    - NUMERO_ECONOMICO
+    - ID_CHOFER
+    - ID_AYUDANTE
+    - ID_AYUDANTE_2
+    - ID_RUTA
+    - TIPO_UNIDAD
+    - CUENTALITROS
+    - ROTOGAUGE
+    - DOTACION
+        - CANTIDAD_10
+        - CANTIDAD_20
+        - CANTIDAD_30
+        - CANTIDAD_45
+
+### ELIMINAR_TODOS [POST]
+
+#### Acciones
+
+- TRUNCATE TABLE cat_unidades
+
+#### Retorno
+
+- N/A
+
+## DB.DAT_PRECIOS [/db.dat_precios]
+
+### AGREGAR [POST]
+
+#### Acciones
+
+- INSERT INTO dat_precios
+    - PRE_ID_GLOBALNET: PARAM.ID_GLOBALNET
+    - PRE_FECHA_ULTIMA_MODIFICACION: PARAM.FECHA_ULTIMA_MODIFICACION
+    - PRE_INDICE: PARAM.INDICE
+    - PRE_PRODUCTO: PARAM.PRODUCTO
+    - PRE_ANIO: PARAM.ANIO
+    - PRE_MES: PARAM.MES
+    - PRE_PRECIO_NETO: PARAM.PRECIO_NETO
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - ID_GLOBALNET
+    - FECHA_ULTIMA_MODIFICACION
+    - INDICE
+    - PRODUCTO
+    - ANIO
+    - MES
+    - PRECIO_NETO
+
+### ACTUALIZAR [POST]
+
+#### Acciones
+
+- IF e_ID = QUERY - SELECT PRE_ID FROM dat_precios WHERE PRE_ID_GLOBALNET=PARAM.ID_GLOBALNET
+    - UPDATE dat_precios WHERE PRE_ID=e_ID
+        - PRE_FECHA_ULTIMA_MODIFICACION: PARAM.FECHA_ULTIMA_MODIFICACION
+        - PRE_INDICE: PARAM.INDICE
+        - PRE_PRODUCTO: PARAM.PRODUCTO
+        - PRE_ANIO: PARAM.ANIO
+        - PRE_MES: PARAM.MES
+        - PRE_PRECIO_NETO: PARAM.PRECIO_NETO
+- ELSE
+    - INSERT INTO dat_precios
+        - PRE_ID_GLOBALNET: PARAM.ID_GLOBALNET
+        - PRE_FECHA_ULTIMA_MODIFICACION: PARAM.FECHA_ULTIMA_MODIFICACION
+        - PRE_INDICE: PARAM.INDICE
+        - PRE_PRODUCTO: PARAM.PRODUCTO
+        - PRE_ANIO: PARAM.ANIO
+        - PRE_MES: PARAM.MES
+        - PRE_PRECIO_NETO: PARAM.PRECIO_NETO
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - ID_GLOBALNET
+    - FECHA_ULTIMA_MODIFICACION
+    - INDICE
+    - PRODUCTO
+    - ANIO
+    - MES
+    - PRECIO_NETO
+
+## DB.DAT_CUENTAS_OCULTAS [/db.dat_cuentas_ocultas]
+
+### AGREGAR [POST]
+
+#### Acciones
+
+- INSERT INTO dat_cuentas_ocultas
+    - CUE_OCU_ID_GLOBALNET: PARAM.ID_GLOBALNET
+    - CUE_OCU_CUENTA_OCULTA: PARAM.CUENTA_OCULTA
+    - CUE_OCU_FECHAHORA: PARAM.FECHAHORA
+    - CUE_OCU_ID_GLOBALNET_UNIDAD: PARAM.ID_GLOBALNET_UNIDAD
+    - CUE_OCU_ESTATUS: PARAM.ESTATUS
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - ID_GLOBALNET
+    - CUENTA_OCULTA
+    - FECHAHORA
+    - ID_GLOBALNET_UNIDAD
+    - ESTATUS
+
+### OCUPADA [POST]
+
+#### Acciones
+
+- UPDATE dat_cuentas_ocultas WHERE CUE_OCU_ID_GLOBALNET=PARAM.ID_GLOBALNET
+    - CUE_OCU_ESTATUS: '1'
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - ID_GLOBALNET
+
+## DB.DAT_SERVICIOS [/db.dat_servicios]
+
+### AGREGAR [POST]
+
+#### Acciones
+
+- INSERT INTO dat_servicios
+    - SER_ID_GLOBALNET: PARAM.ID_GLOBALNET
+    - SER_FECHA_ULTIMA_MODIFICACION: PARAM.FECHA_ULTIMA_MODIFICACION
+    - SER_CLIENTE: PARAM.CLIENTE
+    - SER_CUENTA: PARAM.CUENTA
+    - SER_CUENTA_OCULTA: PARAM.CUENTA_OCULTA
+    - SER_ID_GLOBALNET_UNIDAD: PARAM.ID_GLOBALNET_UNIDAD
+    - SER_TIPO_SERVICIO: PARAM.TIPO_SERVICIO
+    - SER_FECHA_PROGRAMADO: PARAM.FECHA_PROGRAMADO
+    - SER_ESTATUS: PARAM.ESTATUS
+    - SER_DOMICILIO: json_encode(PARAM.DOMICILIO)
+    - SER_INDICE: PARAM.INDICE
+    - SER_DESCUENTO: PARAM.DESCUENTO
+    - SER_APLICA_DESCUENTO: PARAM.APLICA_DESCUENTO
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - ID_GLOBALNET
+    - FECHA_ULTIMA_MODIFICACION
+    - CLIENTE
+    - CUENTA
+    - CUENTA_OCULTA
+    - ID_GLOBALNET_UNIDAD
+    - TIPO_SERVICIO
+    - FECHA_PROGRAMADO
+    - ESTATUS
+    - DOMICILIO
+        - NOMBRE
+        - CALLE
+        - NUMERO_EXTERIOR
+        - NUMERO_INTERIOR
+        - REFERENCIA
+        - COLONIA
+        - MUNICIPIO
+    - INDICE
+    - DESCUENTO
+    - APLICA_DESCUENTO
+
+### ACTUALIZAR [POST]
+
+#### Acciones
+
+- IF e_ID = QUERY - SELECT SER_ID FROM dat_servicios WHERE SER_ID_GLOBALNET=PARAM.ID_GLOBALNET
+    - UPDATE dat_servicios WHERE SER_ID=e_ID
+        - SER_FECHA_ULTIMA_MODIFICACION: PARAM.FECHA_ULTIMA_MODIFICACION
+        - SER_CLIENTE: PARAM.CLIENTE
+        - SER_CUENTA: PARAM.CUENTA
+        - SER_CUENTA_OCULTA: PARAM.CUENTA_OCULTA
+        - SER_UNIDAD: PARAM.ID_GLOBALNET_UNIDAD
+        - SER_TIPO_SERVICIO: PARAM.TIPO_SERVICIO
+        - SER_FECHA_PROGRAMADO: PARAM.FECHA_PROGRAMADO
+        - SER_ESTATUS: PARAM.ESTATUS
+        - SER_DOMICILIO: json_encode(PARAM.DOMICILIO)
+        - SER_INDICE: PARAM.INDICE
+        - SER_DESCUENTO: PARAM.DESCUENTO
+        - SER_APLICA_DESCUENTO: PARAM.APLICA_DESCUENTO
+- ELSE
+    - INSERT INTO dat_servicios
+        - SER_ID_GLOBALNET: PARAM.ID_GLOBALNET
+        - SER_FECHA_ULTIMA_MODIFICACION: PARAM.FECHA_ULTIMA_MODIFICACION
+        - SER_CLIENTE: PARAM.CLIENTE
+        - SER_CUENTA: PARAM.CUENTA
+        - SER_CUENTA_OCULTA: PARAM.CUENTA_OCULTA
+        - SER_UNIDAD: PARAM.ID_GLOBALNET_UNIDAD
+        - SER_TIPO_SERVICIO: PARAM.TIPO_SERVICIO
+        - SER_FECHA_PROGRAMADO: PARAM.FECHA_PROGRAMADO
+        - SER_ESTATUS: PARAM.ESTATUS
+        - SER_DOMICILIO: json_encode(PARAM.DOMICILIO)
+        - SER_INDICE: PARAM.INDICE
+        - SER_DESCUENTO: PARAM.DESCUENTO
+        - SER_APLICA_DESCUENTO: PARAM.APLICA_DESCUENTO
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - ID_GLOBALNET
+    - FECHA_ULTIMA_MODIFICACION
+    - CLIENTE
+    - CUENTA
+    - CUENTA_OCULTA
+    - ID_GLOBALNET_UNIDAD
+    - TIPO_SERVICIO
+    - FECHA_PROGRAMADO
+    - ESTATUS
+    - DOMICILIO
+        - NOMBRE
+        - CALLE
+        - NUMERO_EXTERIOR
+        - NUMERO_INTERIOR
+        - REFERENCIA
+        - COLONIA
+        - MUNICIPIO
+    - INDICE
+    - DESCUENTO
+    - APLICA_DESCUENTO
+
+### EN_PROCESO [POST]
+
+#### Acciones
+
+- UPDATE dat_servicios WHERE SER_ID_GLOBALNET=PARAM.ID_GLOBALNET
+    - SER_ESTATUS: 'EN_PROCESO'
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - ID_GLOBALNET
+
+### SURTIR [POST]
+
+#### Acciones
+
+- UPDATE dat_servicios WHERE SER_ID_GLOBALNET=PARAM.ID_GLOBALNET
+    - SER_ESTATUS: 'SURTIDO'
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - ID_GLOBALNET
+
+### CANCELAR [POST]
+
+#### Acciones
+
+- UPDATE dat_servicios WHERE SER_ID_GLOBALNET=PARAM.ID_GLOBALNET
+    - SER_ESTATUS: 'CANCELADO'
+    - SER_RAZON_CANCELACION: PARAM.RAZON_CANCELACION
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - ID_GLOBALNET
+    - RAZON_CANCELACION
+
+## DB.DAT_LIQUIDACIONES [/db.dat_liquidaciones]
+
+### AGREGAR [POST]
+
+#### Acciones
+
+- INSERT INTO dat_liquidaciones
+    - LIQ_ID_GLOBALNET_UNIDAD: PARAM.ID_GLOBALNET_UNIDAD
+    - LIQ_VIAJE: PARAM.VIAJE
+    - LIQ_FECHA: PARAM.FECHA
+    - LIQ_TIPO_UNIDAD: PARAM.TIPO
+    - LIQ_ID_RUTA: PARAM.ID_RUTA
+    - LIQ_DETALLES: 
+        - ESTACIONARIO: {}
+        - OPERADORES:
+            - ID_CHOFER: PARAM.CHOFER
+            - ID_AYUDANTE: PARAM.AYUDANTE
+            - ID_AYUDANTE_2: PARAM.AYUDANTE_2
+    - LIQ_ESTATUS: 'ABIERTA'
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - ID_GLOBALNET_UNIDAD
+    - VIAJE
+    - FECHA
+    - TIPO_UNIDAD
+    - ID_RUTA
+    - ID_CHOFER
+    - ID_AYUDANTE
+    - ID_AYUDANTE_2
+
+### ASIGNAR_INICIAL_ESTACIONARIO [POST]
+
+#### Acciones
+
+- UPDATE dat_liquidaciones WHERE LIQ_ID=PARAM.ID
+    - LIQ_DETALLES.ESTACIONARIO.MEDIDOR_INICIAL: PARAM.MEDIDOR_INICIAL
+    - LIQ_DETALLES.ESTACIONARIO.ROTOGAUGE_INICIAL: PARAM.ROTOGAUGE_INICIAL
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - ID
+    - MEDIDOR_INICIAL
+    - ROTOGAUTE_INICIAL
+
+### ASIGNAR_FINAL_ESTACIONARIO [POST]
+
+#### Acciones
+
+- UPDATE dat_liquidaciones WHERE LIQ_ID=PARAM.ID
+    - LIQ_ESTATUS: 'CERRADO'
+    - LIQ_DETALLES.ESTACIONARIO.MEDIDOR_FINAL: PARAM.MEDIDOR_FINAL
+    - LIQ_DETALLES.ESTACIONARIO.ROTOGAUGE_FINAL: PARAM.ROTOGAUGE_FINAL
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - ID
+    - MEDIDOR_FINAL
+    - ROTOGAUTE_FINAL
+
+### VALIDAR_FINAL_CILINDRO [POST]
+
+#### Acciones
+
+- UPDATE dat_liquidaciones WHERE LIQ_ID=PARAM.ID
+    - LIQ_ESTATUS: 'CERRADO'
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - ID
+
+## DB.DAT_NOTAS [/db.dat_notas]
+
+### AGREGAR [POST]
+
+#### Acciones
+
+- INSERT INTO dat_notas
+    - NOT_ID_GLOBALNET_UNIDAD: PARAM.ID_GLOBALNET_UNIDAD
+    - NOT_VIAJE: PARAM.VIAJE
+    - NOT_FECHAHORA: PARAM.FECHAHORA
+    - NOT_CLIENTE: PARAM.CLIENTE
+    - NOT_CUENTA: PARAM.CUENTA
+    - NOT_FOLIO: PARAM.FOLIO
+    - NOT_MONTO: PARAM.MONTO
+    - NOT_TIPO_PAGO: PARAM.TIPO_PAGO
+    - NOT_DESCUENTO: PARAM.DESCUENTO
+    - NOT_LATITUD: PARAM.LATITUD
+    - NOT_LONGITUD: PARAM.LONGITUD
+    - NOT_REFERENCIA: json_encode(PARAM.REFERENCIA)
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - ID_GLOBALNET_UNIDAD
+    - VIAJE
+    - FECHAHORA
+    - CLIENTE
+    - CUENTA
+    - FOLIO
+    - MONTO
+    - TIPO_PAGO
+    - DESCUENTO
+    - LATITUD
+    - LONGITUD
+    - REFERENCIA
+        - CANTIDAD_10
+        - CANTIDAD_20
+        - CANTIDAD_30
+        - CANTIDAD_45
+        - PRECIO_10
+        - PRECIO_20
+        - PRECIO_30
+        - PRECIO_45
+        - LITROS
+        - PRECIO
+        - KILOS
+        - PRECIO
+
+## DB.DAT_COLA_APLICACION [/db.dat_cola_aplicacion]
+
+### AGREGAR [POST]
+
+#### Comentarios
+
+Ver diccionario de datos para el contenido de PARAM.DETALLES
+
+#### Acciones
+
+- INSERT INTO dat_cola_aplicacion
+    - COL_APL_FECHAHORA: date()
+    - COL_APL_ID_GLOBALNET_UNIDAD: PARAM.ID_GLOBALNET_UNIDAD
+    - COL_APL_DETALLES: json_encode(PARAM.DETALLES)
+
+#### Retorno
+
+- COL_APL_FECHAHORA
+
++ Attributes
+    - ID_GLOBALNET_UNIDAD
+    - DETALLES
+
+### DEPURAR [POST]
+
+#### Acciones
+
+- DELETE FROM dat_cola_aplicacion WHERE COL_APL_FECHAHORA<CURDATE()
+
+#### Retorno
+
+- N/A
+
+## DB.DAT_COLA_GLOBALNET [/db.dat_cola_globalnet]
+
+### AGREGAR [POST]
+
+#### Comentarios
+
+Ver diccionario de datos para el contenido de PARAM.DETALLES
+
+#### Acciones
+
+- INSERT INTO dat_cola_globalnet
+    - COL_GLO_FECHAHORA: date()
+    - COL_GLO_DETALLES: json_encode(PARAM.DETALLES)
+
+#### Retorno
+
+- COL_GLO_FECHAHORA
+
++ Attributes
+    - DETALLES
+
+### ELIMINAR [POST]
+
+#### Acciones
+
+- DELETE FROM dat_cola_globalnet WHERE COL_GLO_ID=PARAM.ID
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - ID
+
+## DB.LOG_COLA_APLICACION [/db.log_cola_aplicacion]
+
+### AGREGAR [POST]
+
+#### Comentarios
+
+Ver diccionario de datos para el contenido de PARAM.DETALLES
+
+#### Acciones
+
+- INSERT INTO log_cola_aplicacion
+    - COL_APL_FECHAHORA: PARAM.FECHAHORA
+    - COL_APL_ID_GLOBALNET_UNIDAD: PARAM.ID_GLOBALNET_UNIDAD
+    - COL_APL_DETALLES: json_encode(PARAM.DETALLES)
+    - COL_APL_HASH: PARAM.HASH
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - FECHAHORA
+    - ID_GLOBALNET_UNIDAD
+    - DETALLES
+    - HASH
+
+## DB.LOG_COLA_GLOBALNET [/db.log_cola_globalnet]
+
+### AGREGAR [POST]
+
+#### Comentarios
+
+Ver diccionario de datos para el contenido de PARAM.DETALLES
+
+#### Acciones
+
+- INSERT INTO log_cola_globalnet
+    - COL_GLO_FECHAHORA: PARAM.FECHAHORA
+    - COL_GLO_DETALLES: json_encode(PARAM.DETALLES)
+    - COL_GLO_HASH: PARAM.HASH
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - FECHAHORA
+    - DETALLES
+    - HASH
+
+## DB.CONF_GENERAL [/db.conf_general]
+
+### ACTUALIZAR_SINCRONIZACION_GLOBALNET_FECHA_DESCARGA [POST]
+
+#### Acciones
+
+- UPDATE conf_general WHERE GEN_PARAMETRO='SINCRONIZACION_GLOBALNET_FECHA_ULTIMA_DESCARGA'
+    - GEN_VALOR: PARAM.FECHAHORA
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - FECHAHORA
+
+### ACTUALIZAR_EMPLEADOS_FECHA [POST]
+
+#### Acciones
+
+- UPDATE conf_general WHERE GEN_PARAMETRO='EMPLEADOS_FECHA_ULTIMA_ACTUALIZACION'
+    - GEN_VALOR: PARAM.FECHAHORA
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - FECHAHORA
+
+### ACTUALIZAR_EMPLEADOS_ID [POST]
+
+#### Acciones
+
+- UPDATE conf_general WHERE GEN_PARAMETRO='EMPLEADOS_ULTIMO_ID_INSERTADO'
+    - GEN_VALOR: PARAM.ID_GLOBALNET
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - ID_GLOBALNET
+
+### ACTUALIZAR_UNIDADES_FECHA [POST]
+
+#### Acciones
+
+- UPDATE conf_general WHERE GEN_PARAMETRO='UNIDADES_FECHA_ULTIMA_ACTUALIZACION'
+    - GEN_VALOR: PARAM.FECHAHORA
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - FECHAHORA
+
+### ACTUALIZAR_UNIDADES_ID [POST]
+
+#### Acciones
+
+- UPDATE conf_general WHERE GEN_PARAMETRO='UNIDADES_ULTIMO_ID_INSERTADO'
+    - GEN_VALOR: PARAM.ID_GLOBALNET
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - ID_GLOBALNET
+
+### ACTUALIZAR_PRECIOS_FECHA [POST]
+
+#### Acciones
+
+- UPDATE conf_general WHERE GEN_PARAMETRO='PRECIOS_FECHA_ULTIMA_ACTUALIZACION'
+    - GEN_VALOR: PARAM.FECHAHORA
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - FECHAHORA
+
+### ACTUALIZAR_PRECIOS_ID [POST]
+
+#### Acciones
+
+- UPDATE conf_general WHERE GEN_PARAMETRO='PRECIOS_ULTIMO_ID_INSERTADO'
+    - GEN_VALOR: PARAM.ID_GLOBALNET
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - ID_GLOBALNET
+
+### ACTUALIZAR_SERVICIOS_FECHA [POST]
+
+#### Acciones
+
+- UPDATE conf_general WHERE GEN_PARAMETRO='SERVICIOS_FECHA_ULTIMA_ACTUALIZACION'
+    - GEN_VALOR: PARAM.FECHAHORA
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - FECHAHORA
+
+### ACTUALIZAR_SERVICIOS_ID [POST]
+
+#### Acciones
+
+- UPDATE conf_general WHERE GEN_PARAMETRO='SERVICIOS_ULTIMO_ID_INSERTADO'
+    - GEN_VALOR: PARAM.ID_GLOBALNET
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - ID_GLOBALNET
+
+### ACTUALIZAR_CUENTAS_OCULTAS_ID [POST]
+
+#### Acciones
+
+- UPDATE conf_general WHERE GEN_PARAMETRO='CUENTAS_OCULTAS_ULTIMO_ID_INSERTADO'
+    - GEN_VALOR: PARAM.ID_GLOBALNET
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - ID_GLOBALNET
+
+## DB.SEG_SESIONES [/db.seg_sesiones]
+
+### AGREGAR [POST]
+
+#### Acciones
+
+- INSERT INTO seg_sesiones
+    - SES_EMPLEADO: PARAM.ID_GLOBALNET_EMPLEADO
+    - SES_SESION: Genera un codigo REGEX.SESION
+    - SES_VIGENCIA: date() + 1 dia
+    - SES_SECRET: Genera un codigo REGEX.APIKEY
+- e_HEADER = '{"alg":"HS256","typ":"JWT"}'
+- e_PAYLOAD = '{"e":"SES_EMPLEADO","s":"SES_SESION"}'
+- e_JWT: base64_encode(e_HEADER) . "." . base64_encode(e_PAYLOAD) . "." . base64_encode(hash_hmac('sha256', base64_encode(e_HEADER) . "." . base64_encode(e_PAYLOAD), SES_SECRET, true))
+
+#### Retorno
+
+- e_JWT
+
++ Attributes
+    - ID_GLOBALNET_EMPLEADO
+
+### DEPURAR [POST]
+
+#### Acciones
+
+- DELETE FROM seg_sesiones WHERE SES_VIGENCIA<NOW()
+
+#### Retorno
+
+- N/A
+
+## FS.CAT_EMPLEADOS [/fs.cat_empleados]
+
+### GUARDAR [GET]
+
+#### Acciones
+
+- file_put_contents("usr/img/empleados/" . PARAM.ID_GLOBALNET . "_perfil_cuadrado.dat", PARAM.IMAGEN)
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - ID_GLOBALNET
+    - IMAGEN
+
+### ELIMINAR_TODOS [GET]
+
+#### Acciones
+
+- array_map('unlink', glob("usr/img/empleados/*_perfil_cuadrado.dat"));
+
+#### Retorno
+
+- N/A
+
+## WS.GLOBALNET [/ws.globalnet]
+
+### CARGAR_SINCRONIZACION
+
+#### Librerias
+
+- GLOBAL_GAS.BE:C4.LIBRARY.GLOBALNET
+
+#### Acciones
+
+- TRY
+    - GLOBAL_GAS.BE:C4.LIBRARY.GLOBALNET.CARGAR_SINCRONIZACION (DETALLES)
+        - DETALLES: PARAM.DETALLES
+- CATCH
+    - RETHROW
+
+#### Retorno
+
+- N/A
+
+#### Excepciones
+
+- ???
+
++ Attributes
+    - DETALLES
+

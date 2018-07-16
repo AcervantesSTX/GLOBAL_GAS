@@ -1,0 +1,186 @@
+FORMAT: 1A
+HOST: https://globalgas.com
+
+# Global Gas - C1 Librerias
+
+## AUTENTICACION [/autenticacion]
+
+### VALIDAR_SESION [POST]
+
+#### Librerias
+
+- TOKENCASH:C2.LIBRARY.EMPLEADO
+- TOKENCASH:C2.LIBRARY.UNIDAD
+
+#### Acciones
+
+- IF NOT PARAM.JWT
+    - THROW GLOBAL_GAS.BE:C1.LIBRARY.AUTORIZACION.VALIDAR_SESION.INVALIDA El header de autorizacion esta vacio
+- LIST(e_HEADER, e_PAYLOAD_BASE64, e_SIGNATURE) = EXPLODE(PARAM.JWT, '.')
+- e_PAYLOAD_JSON = base64_decode(e_PAYLOAD_BASE64)
+- IF NOT m_PAYLOAD = json_decode(e_PAYLOAD_JSON, true)
+    - THROW GLOBAL_GAS.BE:C1.LIBRARY.AUTORIZACION.VALIDAR_SESION.INVALIDA El formato del JWT es invalido
+- IF NOT a_SESION = QUERY - SELECT SES_VIGENCIA, SES_SECRET FROM seg_sesiones WHERE SES_EMPLEADO='m_PAYLOAD.e' AND SES_SESION='PAYLOAD.s'
+    - THROW GLOBAL_GAS.BE:C1.LIBRARY.AUTORIZACION.VALIDAR_SESION.INVALIDA Sesion inexistente
+- IF NOT VALIDAR JWT CON SESION.SES_SECRET
+    - THROW GLOBAL_GAS.BE:C1.LIBRARY.AUTORIZACION.VALIDAR_SESION.INVALIDA El contenido del JWT es invalido
+- IF a_SESION.SES_VIGENCIA < date('Y-m-d H:i:s')
+    - THROW GLOBAL_GAS.BE:C1.LIBRARY.AUTORIZACION.VALIDAR_SESION.INVALIDA Sesion expirada
+- IF NOT e_NUMERO =  QUERY - SELECT EMP_NUMERO FROM cat_empleados WHERE EMP_ID_GLOBALNET=m_PAYLOAD.e
+    THROW GLOBAL_GAS.BE:C1.LIBRARY.AUTORIZACION.VALIDAR_SESION.INVALIDA Empleado inexistente
+- $GLOBALS['SYSTEM']['SECURITY']['EMPLEADO'] = NEW USUARIO (NUMERO)
+    - NUMERO: e_NUMERO
+- TRY
+    - $GLOBALS['SYSTEM']['SECURITY']['EMPLEADO'].VALIDAR_SUPERVISOR ()
+- CATCH    
+    - IF NOT e_ID_GLOBALNET_UNIDAD =  QUERY - SELECT UNI_ID_GLOBALNET FROM cat_unidades WHERE UNI_ID_CHOFER='m_PAYLOAD.e' OR UNI_ID_AYUDANTE='m_PAYLOAD.e' OR UNI_ID_AYUDANTE_2='m_PAYLOAD.e'
+        THROW GLOBAL_GAS.BE:C1.LIBRARY.AUTORIZACION.VALIDAR_SESION.INVALIDA El empleado no tiene unidad asignada
+    - $GLOBALS['SYSTEM']['SECURITY']['UNIDAD'] = NEW UNIDAD (ID_GLOBALNET)
+        - ID_GLOBALNET: e_ID_GLOBALNET_UNIDAD
+- $GLOBALS['SYSTEM']['SECURITY']['SESION'] = PAYLOAD.s
+
+#### Retorno
+
+- N/A
+
+#### Excepciones
+
+- GLOBAL_GAS.BE:C1.LIBRARY.AUTORIZACION.VALIDAR_SESION.INVALIDA
+
++ Attributes
+    - JWT
+
+## VALIDACION [/validacion]
+
+### VALIDAR [POST]
+
+#### Acciones
+
+- IF PARAM.OBLIGATORIO AND NOT PARAM.VALOR
+    - THROW TOKENCASH:C1.LIBRARY.VALIDACION.OBLIGATORIO El parametro X es obligatorio
+- IF NOT PARAM.OBLIGATORIO AND NOT PARAM.VALOR
+    - RETURN
+- IF NOT PARAM.VALIDACION
+    - RETURN
+- LIST(e_TIPO_VALIDACION, e_SUBTIPO_VALIDACION) = EXPLODE('.', PARAM.VALIDACION)
+- SWITCH e_TIPO_VALIDACION
+    - CASE 'REGEXP'
+        - IF NOT VALIDAR_REGEXP(e_SUBTIPO_VALIDACION, PARAM.VALOR, PARAM.PARAMETRO)
+            - THROW TOKENCASH:C1.LIBRARY.VALIDACION.INVALIDO El valor del parametro X es invalido
+    - CASE 'FUNC'
+        - IF NOT VALIDAR_FUNC(e_SUBTIPO_VALIDACION, PARAM.VALOR)
+            - THROW TOKENCASH:C1.LIBRARY.VALIDACION.INVALIDO El valor del parametro X es invalido
+
+#### Retorno
+
+- N/A
+
+#### Excepciones
+
+- TOKENCASH:C1.LIBRARY.VALIDACION.OBLIGATORIO
+- TOKENCASH:C1.LIBRARY.VALIDACION.INVALIDO
+
++ Attributes
+    - NOMBRE
+    - VALOR
+    - OBLIGATORIO
+    - VALIDACION
+    - PARAMETRO
+
+### VALIDAR_REGEXP [POST]
+
+#### Diccionario
+
+- 'ID' => '^\d{1,10}$',
+- 'NOMBRE' => '^[\wàèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇßØøÅåÆæœ ]{1,100}$', ***
+- 'TELEFONO' => '^\d{10}$',
+- 'USUARIO' => '^\d{11,13}$',
+- 'CUENTA' => '^\d{11,13}(.\d+)?$',
+- 'TIMEZONE' => '^[+-][01][0-9]:00$',
+- 'GEOCORDENADA' => '^\-?\d+(\.\d+)?$',
+- 'NIP' => '^\d{4}$',
+- 'CONTRASENA' => '^(?=.*\d)(?=.*[a-zA-Z]).{8,}$',
+- 'ABREVIATURA' => '^\w{1,10}$',
+- 'TEXTO' => '^.{1,65536}$',
+- 'MONEDA' => '^\d*(\.\d{1,2})?$',
+- 'TDC' => '^\d*(\.\d{1,6})?$',
+- 'CORREO' => "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$",
+- 'FECHA' => '^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$',
+- 'FECHAHORA' => '^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) ([0-1][0-9]|2[0-3])(:)([0-5][0-9])(:)([0-5][0-9])$',
+- 'BOLSA' => '^(TOKENCASH|G_\d{1,10}|M_\d{1,10})$',
+- 'TRANSACCION_TOKEN' => '^[A-Z]{3}[\d]{17}[\w]{5}$',
+- 'TRANSACCION' => '^[A-Z]{3}[\d]{17}[\w]{10}$',
+- 'TOKEN_CUENTA' => '^(?=.*[a-z])[a-z\d]{4,9}$',
+- 'TOKEN_MONTO_SOLICITADO' => '\d{4,6}',
+- 'CUPON' => '^[a-z\d]{10}$',
+- 'APIKEY' => '^[A-Za-z\d]{50}$',
+- 'SESION' => '^[A-Za-z\d]{10}$',
+- 'ALFANUMERICO' => '^[\wàèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇßØøÅåÆæœ ]{LONGITUD}$', ***
+- 'NUMERICO' => '^\d{LONGITUD}$',
+- 'REGEXP' => '^REGEXP$',
+- 'ABIERTO' => '^.{LONGITUD}$'
+
+#### Acciones
+
+- e_REGEXP = OBTENER REGEXP DE DICCIONARIO
+- e_REGEXP = REEMPLAZAR PARAMETROS
+- RETURN PREG_MATCH
+
+#### Retorno
+
+- TRUE/FALSE
+
++ Attributes
+    - VALIDACION
+    - VALOR
+    - PARAMETRO
+
+### VALIDAR_FUNC [POST]
+
+#### Acciones
+
+- RETURN EVALUAR FUNCION
+
+#### Retorno
+
+- TRUE/FALSE
+
++ Attributes
+    - VALIDACION
+    - VALOR
+
+## CONEXION [/conexion]
+
+### CONECTAR [POST]
+
+#### Acciones
+
+- IF NOT e_INSTANCIA = QUERY - SELECT PLA_INSTANCIA FROM cat_plantas WHERE PLA_NOMBRE='{PARAM.INSTANCIA}' AND PLA_ELIMINADO=''
+    - THROW GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.ERROR_CONEXION Error al conectar a la base de datos
+- $GLOBALS['SYSTEM']['SECURITY']['INSTANCIA'] = e_INSTANCIA
+
+#### Retorno
+
+- N/A
+
+#### Excepciones
+
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.ERROR_CONEXION
+
++ Attributes
+    - INSTANCIA
+
+### VALIDAR_EJECUCION_CONSOLA [POST]
+
+#### Acciones
+
+- IF NOT isset($GLOBALS['SYSTEM']['REQUEST']['ARGV'])
+    - THROW GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.VALIDAR_EJECUCION_CONSOLA.EJECUCION_INVALIDA Ejecucion incorrecta del metodo
+
+#### Retorno
+
+- N/A
+
+#### Excepciones
+
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.VALIDAR_EJECUCION_CONSOLA.EJECUCION_INVALIDA
