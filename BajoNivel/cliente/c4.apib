@@ -1,0 +1,267 @@
+FORMAT: 1A
+HOST: http://polls.apiblueprint.org/
+
+# Cliente Global Gas - C4
+
+## DB.CAT_CLIENTES [/db.cat_cliente]
+
+### ELIMINAR_TODOS[POST]
+
+#### Acciones
+
+- TRUNCATE TABLE cat_clientes
+
+#### Retorno
+
+- N/A
+
+### AGREGAR[POST]
+
+#### Acciones
+
+- INSERT INTO cat_cliente
+    - CLI_ID: PARAM.ID_CLIENTE
+    - CLI_FECHA_ULTIMA_MODIFICACION: PARAM.FECHA_ULTIMA_MODIFICACION
+    - CLI_TELEFONO: PARAM.TELEFONO
+    - CLI_DOMICILIO: PARAM.DOMICILIO
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - ID_CLIENTE
+    - FECHA_ULTIMA_MODIFICACION
+    - NOMBRE
+    - NUMERO
+    - TELEFONO
+
+### ACTUALIZAR [POST]
+
+#### Acciones
+
+- UPDATE cat_clientes WHERE CLI_ID=e_ID
+    - CLI_FECHA_ULTIMA_MODIFICACION: PARAM.FECHA_ULTIMA_MODIFICACION
+    - CLI_FECHA_DOMICILIO: PARAM.DOMICILIO
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - FECHA_ULTIMA_MODIFICACION
+    - DOMICILIO
+    - e_ID
+
+### ASIGNAR_ID_GLOBALNET[POST]
+
+#### Acciones
+
+- UPDATE cat_clientes WHERE CLI_ID = e_CLIENTE_ID AND CLI_ID = ID_GLOBALNET
+    - CLI_ID_GLOBALNET : PARAM.ID_GLOBALNET
+- RETURN TRUE    
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - e_CLIENTE_ID
+    - ID_GLOBALNET
+    
+    
+## DB.CAT_CLIENTES_ACCESOS [/db.cat_clientes_accesos]
+
+### GENERAR_APIKEY
+
+#### Acciones
+
+- IF e_ID = QUERY - SELECT CLI_ACC_ID FROM cat_clientes_accesos WHERE CLI_ACC_TELEFONO = PARAM.ID_TELEFONO
+    - UPDATE cat_clientes_accesos WHERE CLI_ACC_ID = e_ID
+        CLI_ACC_APIKEY : Generar un codigo REGEX.APIKEY
+- ELSE
+    - INSERT INTO cat_clientes_accesos
+        - CLI_ACC_TELEFONO : PARAM.ID_TELEFONO
+        - CLI_ACC_APIKEY : Generar un codigo REGEX.APIKEY
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - TELEFONO
+    
+## DB.CAT_CLIENTE_CODIGO [/db.cat_cliente_codigos]    
+
+### AGREGAR[POST]
+
+#### Acciones
+
+- INSERT cat_clientes_codigos
+    - CLI_COD_TELEFONO: PARAM.TELEFONO
+    - CLI_COD_ CODIGO: PARAM.CODIGO 
+    - CLI_COD_VIGENCIA: PARAM.VIGENCIA 
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - TELEFONO
+    - CODIGO
+    - VIGENCIA
+
+## DB.CAT_CUENTAS [/db.cat_cuentas]    
+
+### AGREGAR[POST]
+
+#### Acciones
+
+- INSERT cat_clientes_codigos
+    - CUE_DOMICILIO: PARAM.DOMICILIO
+    - CUE_TIPO_SERVICIO: TIPO_SERVICIO
+    - CUE_TELEFONO: PARAM.TELEFONO
+    - CUE_ID_CLIENTE: PARAM.ID_CLIENTE
+    - CUE_COORDENADAS : PARAM.COORDENADAS
+         - LATITUD : PARAM.COORDENADAS->LATIUD
+         - LONGITUD : PARAM.COORDENADAS->LONGITUD
+    - CUE_CICLO: PARAM.CICLO
+        - TIPO : PARAM.CICLO.TIPO
+        - VALOR : PARAM.CICLO.VALOR
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - DOMICLIO
+    - TIPO_SERVICIO
+    - TELEFONO
+    - ID_CLIENTE
+    - COORDENADA
+    - CICLO
+    
+
+### ACTUALIZAR[POST]
+
+#### Acciones
+
+- UPDATE cat_cuentas WHERE CUE_ID_CUENTA = ID_CUENTA
+    - CUE_DOMICILIO: PARAM.DOMICILIO
+    - CUE_TIPO_SERVICIO: PARAM.TIPO_SERVICIO
+    - CUE_TELEFONO: PARAM.TELEFONO
+    - CUE_ID_CLIENTE: PARAM.ID_CLIENTE
+    - CUE_CICLO: PARAM.CICLO
+        - TIPO : PARAM.CICLO->TIPO
+        - VALOR : PARAM.CICLO->VALOR
+    - CUE_COORDENADA : PARAM.COORDEANDAS
+        LONGITUD : PARAM.COORDENADAS->LONGITUD
+        LATITUD : PARAM.COORDENADAS->LATITUD
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - DOMICILIO
+    - TIPO_SERVICIO
+    - TELEFONO
+    - ID_CUENTA
+    - ID_CLIENTE
+    - CICLO
+    
+
+### ELIMINAR
+
+#### Acciones
+
+- UPDATE cat_cuentas WHERE CUE_ID = e_ID_CUENTA
+    - CUE_ACTIVO: 0
+
+##### Retorno 
+
+- N/A
+
++ Attributes
+    - ID_CUENTA
+
+### ASIGNAR_ID_GLOBALNET
+
+#### Acciones
+
+- UPDATE cat_cuentas WHERE CUE_ID = CUE_ID_GLOBALNET AND CUE_ID=e_ID_CUENTA
+    - CUE_ID_GLOBALNET: PARAMS.ID_GLOBALNET
+
+##### Retorno 
+
+- N/A
+
++ Attributes
+    - ID_GLOBALNET
+    - ID_CLIENTE    
+
+### ELIMINAR_TODOS[POST]
+
+#### Acciones
+
+- TRUNCATE TABLE cat_cuentas
+
+#### Retorno
+
+- N/A    
+
+## DB.DAT_SERVICIOS [/db.dat_servicios]
+
+### AGREGAR[POST]
+
+#### Acciones
+
+- INSERT INTO dat_servicio 
+    - SER_CUENTA: PARAM.ID_CUENTA
+    - SER_CLIENTE:  PARAM.ID_CLIENTE
+    - SER_DETALLES: PARAM.DETALLES
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - ID_CUENTA
+    - ID_CLIENTE
+    - DETALLES
+
+### ACTUALIZAR[POST]
+
+#### Acciones
+
+- UPDATE dat_servicios WHERE SER_ID=ID_SERVICIO
+    - SER_CLIENTE: PARAM.ID_CLIENTE
+    - SER_CUENTA: PARAM.ID_CUENTA
+    - SER_DETALLES: PARAM.DETALLES
+
+#### Retorno
+
+- N/A
+
++ Attributes
+    - ID_CLIENTE
+    - ID_CUENTA
+    - DETALLES
+
+### ASIGNAR_ID_GLOBALNET
+
+- UPDATE dat_servicios WHERE SER_ID=SER_ID_GLOBALNET AND SER_ID=e_ID_SER
+    - SER_ID_GLOBALNET: PARAM.ID_GLOBALNET
+    - SER_ESTADO : 'ACTIVO'
+
+#### Retorno    
+    
+- N/A
+
++ Attributes
+    - ID_GLOBALNET
+    - e_ID_SER
+    
+    
+    
+    

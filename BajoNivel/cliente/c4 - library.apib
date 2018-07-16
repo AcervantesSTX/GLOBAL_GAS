@@ -1,0 +1,24 @@
+FORMAT: 1A
+HOST: https://globalgas.com
+
+# Global Gas - C4 Librerias
+
+## GLOBALNET [/globalnet]
+
+### CARGAR_SINCRONIZACION [POST]
+
+#### Acciones
+
+- e_URL_PLANTA = QUERY - SELECT PLA_URL FROM cat_plantas WHERE PLA_INSTANCIA='{$GLOBALS['SYSTEM']['SECURITY']['INSTANCIA']}'
+- CURL A SERVIDOR DE LA PLANTA
+
+#### Retorno
+
+- N/A
+
+#### Excepciones
+
+- N/A
+
++ Attributes
+    - DETALLES

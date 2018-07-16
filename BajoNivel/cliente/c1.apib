@@ -1,0 +1,1635 @@
+FORMAT: 1A
+HOST: http://polls.apiblueprint.org/
+
+# Cliente Global Gas - C1
+
+La definicion del proyecto en bajo nivel de Cliente - Global Gas.
+
+## CAT.CLIENTES [/cat.clientes]
+
+### REPLICAR [POST]
+
+#### Comentarios 
+
+- Ejecutado por usuario desde la consola
+
+#### Librerias
+
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION
+
+#### Acciones
+ 
+- TRY
+    - GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.VALIDAR_EJECUCION_CONSOLA()
+    - GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR (INSTANCIA)
+        - INSTANCIA: PARAM.INSTANCIA
+    - GLOBAL_GAS.BE:C2.COMMAND.CAT.CLIENTES.REPLICAR ()
+- CATCH
+    - SWITCH
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.VALIDAR_EJECUCION_CONSOLA.EJECUCION_INVALIDA
+            - RETURN 400-04
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONEXTAR.ERROR_CONEXION
+            - RETURN 400-03
+        - DEFAULT
+            - RETURN 500
+
+#### Retorno
+
+- 200
+    - status: 'success'
+- 400-03 GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.ERROR_CONEXION
+- 400-04 GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.VALIDAR_EJECUCION_CONSOLA.EJECUCION_INVALIDA
+
+#### Exceptiones
+
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.INSTANCIA_INEXISTENTE
+
++ Attributes
+    - INSTANCIA
+    
++ Response 200
+
+        [
+            {
+                "status" : 'success'
+            }
+        ]
+
++ Response 400
+    
+        [
+            {
+                "status" : false
+                "error_code" : '400-03'
+                "error_message" : 'Error de conexion'
+            }
+        ]
+
++ Response 400
+    
+        [
+            {
+                "status" : false
+                "error_code" : '400-04'
+                "error_message" : 'Ejecucion invalida'
+            }
+        ]
+
+### CONSULTAR_CLIENTE [POST]
+
+#### Librerias
+
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION
+
+#### Acciones
+ 
+- TRY
+    - GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR (INSTANCIA)
+        - INSTANCIA: PARAM.INSTANCIA
+    - GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR (NOMBRE, VALOR, OBLIGATORIO, VALIDACION, PARAMETRO)
+        - NOMBRE: 'ID_CLIENTE'
+        - VALOR: PARAM.ID_CLIENTE
+        - OBLIGATORIO: TRUE
+        - VALIDACION: 'Func.is_numeric()'
+        - PARAMETRO: []    
+    - USUARIO = GLOBAL_GAS.BE:C2.COMMAND.CON.CLIENTES.CONSULTAR_CLIENTE ( ID_CLIENTE ) 
+- CATCH
+     - SWITCH
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONEXTAR.ERROR_CONEXION
+            - RETURN 400-03
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO'
+            - RETURN 400-01
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO'
+            - RETURN 400-02    
+        - DEFAULT
+            - RETURN 500
+
+#### Retorno
+
+- 200
+    - status: 'success'
+    - ID_CLIENTE : NUMERIC
+    - NUMERO_CLIENTE : NUMERIC
+- 400-03 GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.ERROR_CONEXION
+- 400-01 GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO
+- 400-02 GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO
+
+#### Exceptiones
+
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.INSTANCIA_INEXISTENTE
+
++ Attributes
+    - INSTANCIA
+    - ID_CLIENTE
+    
++ Response 200
+
+        [
+            {
+                "status" : 'success',
+                "ID_CLIENTE" : '145',
+                "NUMERO_CUENTA": '21578154582'
+            }
+        ]
+
++ Response 400
+    
+        [
+            {
+                "status" : false
+                "error_code" : '400-03'
+                "error_message" : 'Error de conexion'
+            }
+        ]
+
++ Response 400
+    
+        [
+            {
+                "status" : false
+                "error_code" : '400-04'
+                "error_message" : 'Ejecucion invalida'
+            }
+        ]        
+
+### GENERAR_CODIGO [POST]
+
+#### Librerias
+
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION
+- GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION
+
+#### Acciones
+ 
+- TRY
+    - GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR (INSTANCIA)
+        - INSTANCIA: PARAM.INSTANCIA
+    - GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR (NOMBRE, VALOR, OBLIGATORIO, VALIDACION, PARAMETRO)
+        - NOMBRE: 'TELEFONO'
+        - VALOR: PARAM.TELEFONO
+        - OBLIGATORIO: TRUE
+        - VALIDACION: 'REGEXP.TELEFONO'
+        - PARAMETRO: []
+    - GLOBAL_GAS.BE:C2.COMMAND.CAT.CLIENTES.GENERAR_CODIGO ( TELEFONO )    
+- CATCH
+    - SWITCH
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONEXTAR.ERROR_CONEXION
+            - RETURN 400-03
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO'
+            - RETURN 400-01
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO'
+            - RETURN 400-02    
+        - DEFAULT
+            - RETURN 500
+
+#### Retorno
+
+- 200
+    - status: 'success'
+- 400-03 GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.ERROR_CONEXION
+- 400-01 GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO
+- 400-02 GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO
+
+#### Exceptiones
+
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.INSTANCIA_INEXISTENTE
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.ERROR_CONEXION
+- GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO
+- GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO
+
++ Attributes
+    - INSTANCIA
+    - TELEFONO
+
++ Response 200
+
+        [
+            {
+                "status" : 'success'
+            }
+        ]
+
++ Response 400
+
+        [
+            {
+                "status" : false
+                "error_code" : '400-03'
+                "error_message" : 'Error de conexion'
+            }
+        ]
+
++ Response 400
+
+        [
+            {
+                "status" : false
+                "error_code" : '400-01'
+                "error_message" : "El parametro TELEFONO es requerido"
+            }
+        ]
+    
++ Response 400
+
+        [
+            {
+                "status" : false
+                "error_code" : '400-02'
+                "error_message" : "El parametro TELEFONO es invalido"
+            }
+        ]    
+
+### INICIAR_SESION [POST]
+
+#### Librerias
+
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION
+- GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION
+
+#### Acciones
+ 
+- TRY
+    - GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR (INSTANCIA)
+        - INSTANCIA: PARAM.INSTANCIA
+    - GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR (NOMBRE, VALOR, OBLIGATORIO, VALIDACION, PARAMETRO)
+        - NOMBRE: 'TELEFONO'
+        - VALOR: PARAM.TELEFONO
+        - OBLIGATORIO: TRUE
+        - VALIDACION: 'REGEXP.TELEFONO'
+        - PARAMETRO: []
+    - GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR (NOMBRE, VALOR, OBLIGATORIO, VALIDACION, PARAMETRO)
+        - NOMBRE: 'NUMERO_CUENTA'
+        - VALOR: PARAM.NUMERO_CUENTA
+        - OBLIGATORIO: TRUE
+        - VALIDACION: 'REGEXP.NUMERO_CUENTA'
+        - PARAMETRO: []    
+    - GLOBAL_GAS.BE:C2.COMMAND.CAT.CLIENTES.INICIAR_SESION ( TELEFONO, NUMERO_CUENTA  )    
+- CATCH
+    - SWITCH
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONEXTAR.ERROR_CONEXION'
+            - RETURN 400-03
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO'
+            - RETURN 400-01
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO'
+            - RETURN 400-02
+        - CASE 'GLOBAL_GAS.BE:C2.LIBRARY.CLIENTE.CONSTRUCTOR.TELEFONO'
+            - RETURN 402-01    
+        - DEFAULT
+            - RETURN 500
+
+#### Retorno
+
+- 200
+    - status: 'success'
+    - ID_CLIENTE : 'numerico'
+- 400-03 GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.ERROR_CONEXION
+- 400-01 GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO
+- 400-02 GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO
+
+#### Exceptiones
+
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.INSTANCIA_INEXISTENTE
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.ERROR_CONEXION
+- GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO
+- GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO
+
++ Attributes
+    - INSTANCIA
+    - TELEFONO 
+    - NUMERO_CUENTA
+
++ Response 200
+    
+        [
+            {
+                "status" : 'success'
+            }
+        ]
+
++ Response 400
+    
+        [
+            {
+                "status" : false
+                "error_code" : '400-03'
+                "error_message" : 'Error de conexion'
+            }
+        ]
+
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-01'
+                "error_message" : "El parametro TELEFONO es requerido"
+            }
+        ]
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-02'
+                "error_message" : "El parametro TELEFONO es invalido"
+            }
+        ]
+        
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-01'
+                "error_message" : "El parametro NUMERO_CUENTA es requerido"
+            }
+        ]
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-02'
+                "error_message" : "El parametro NUMERO_CUENTA es invalido"
+            }
+        ]    
+
+### VALIDAR_CODIGO [POST]
+
+#### Librerias
+
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION
+- GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION
+
+#### Acciones
+ 
+- TRY
+    - GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR (INSTANCIA)
+        - INSTANCIA: PARAM.INSTANCIA
+    - GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR (NOMBRE, VALOR, OBLIGATORIO, VALIDACION, PARAMETRO)
+        - NOMBRE: 'TELEFONO'
+        - VALOR: PARAM.TELEFONO
+        - OBLIGATORIO: TRUE
+        - VALIDACION: 'REGEXP.TELEFONO'
+        - PARAMETRO: []
+    - GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR (NOMBRE, VALOR, OBLIGATORIO, VALIDACION, PARAMETRO)
+        - NOMBRE: 'CODIGO'
+        - VALOR: PARAM.CODIGO
+        - OBLIGATORIO: TRUE
+        - VALIDACION: 'Fuc.is_array'
+        - PARAMETRO: []    
+    - GLOBAL_GAS.BE:C2.COMMAND.CON.CLIENTES.VALIDAR_CODIGO ( TELEFONO, CODIGO )    
+- CATCH
+    - SWITCH
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONEXTAR.ERROR_CONEXION'
+            - RETURN 400-03
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO'
+            - RETURN 400-01
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO'
+            - RETURN 400-02
+        - CASE 'GLOBAL_GAS.BE:C2.LIBRARY.CLIENTE.CONSTRUCTOR.TELEFONO'
+            - RETURN 402-01    
+        - DEFAULT
+            - RETURN 500
+
+#### Retorno
+
+- 200
+    - status: 'success'
+- 400-03 GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.ERROR_CONEXION
+- 400-01 GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO
+- 400-02 GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO
+
+#### Exceptiones
+
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.INSTANCIA_INEXISTENTE
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.ERROR_CONEXION
+- GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO
+- GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO
+
++ Attributes
+    - INSTANCIA
+    - TELEFONO 
+    - CODIGO    
+
++ Response 200
+    
+        [
+            {
+                "status" : 'success'
+            }
+        ]
+
++ Response 400
+    
+        [
+            {
+                "status" : false
+                "error_code" : '400-03'
+                "error_message" : 'Error de conexion'
+            }
+        ]
+
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-01'
+                "error_message" : "El parametro TELEFONO es requerido"
+            }
+        ]
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-02'
+                "error_message" : "El parametro TELEFONO es invalido"
+            }
+        ]
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-01'
+                "error_message" : "El parametro CODIGO es requerido"
+            }
+        ]
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-02'
+                "error_message" : "El parametro CODIGO es invalido"
+            }
+        ]
+
+### AGREGAR [POST]
+
+#### Librerias
+
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION
+- GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION
+
+#### Acciones
+ 
+- TRY
+    - GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR (INSTANCIA)
+        - INSTANCIA: PARAM.INSTANCIA
+    - GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR (NOMBRE, VALOR, OBLIGATORIO, VALIDACION, PARAMETRO)
+        - NOMBRE: 'DOMICILIO'
+        - VALOR: PARAM.DOMICILIO
+        - OBLIGATORIO: TRUE
+        - VALIDACION: 'REGEXP.TEXTO'
+        - PARAMETRO: []
+    - GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR (NOMBRE, VALOR, OBLIGATORIO, VALIDACION, PARAMETRO)
+        - NOMBRE: 'TIPO_SERVICIO'
+        - VALOR: PARAM.TIPO_SERVICIO
+        - OBLIGATORIO: TRUE
+        - VALIDACION: 'REGEXP.TEXTO'
+        - PARAMETRO: []
+    - GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR (NOMBRE, VALOR, OBLIGATORIO, VALIDACION, PARAMETRO)
+        - NOMBRE: 'TELEFONO'
+        - VALOR: PARAM.TELEFONO
+        - OBLIGATORIO: TRUE
+        - VALIDACION: 'REGEXP.TELEFONO'
+        - PARAMETRO: []
+    - GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR (NOMBRE, VALOR, OBLIGATORIO, VALIDACION, PARAMETRO)
+        - NOMBRE: 'CICLO'
+        - VALOR: PARAM.CICLO
+        - OBLIGATORIO: TRUE
+        - VALIDACION: 'Func.is_array()'
+        - PARAMETRO: []    
+    - e_ID_CLIENTE = GLOBAL_GAS.BE:C2.COMMAND.CAT.CLIENTES.AGREGAR ( DOMICILIO, TIPO_SERVICIO, TELEFONO, CICLO->{'TIPO', 'VALOR'}, COORDENADA->{'LONGITUD', 'LATITUD'} )    
+- CATCH
+    - SWITCH
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONEXTAR.ERROR_CONEXION'
+            - RETURN 400-03
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO'
+            - RETURN 400-01
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO'
+            - RETURN 400-02
+        - CASE 'GLOBAL_GAS.BE:C2.LIBRARY.CLIENTE.CONSTRUCTOR.TELEFONO'
+            - RETURN 402-01    
+        - DEFAULT
+            - RETURN 500
+
+#### Retorno
+
+- 200
+    - status: 'success'
+    - e_ID_CLIENTE: 'numeric'
+- 400-03 GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.ERROR_CONEXION
+- 400-01 GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO
+- 400-02 GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO
+
+#### Exceptiones
+
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.INSTANCIA_INEXISTENTE
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.ERROR_CONEXION
+- GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO
+- GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO
+
++ Attributes
+    - INSTANCIA
+    - DOMICILIO
+    - TIPO_SERVICIO
+    - TELEFONO 
+    - CICLO -> TIPO , VALOR
+    - COORDENADA -> LATITUD, LONGITUD
+    
++ Response 200
+    
+        [
+            {
+                "status" : 'success'
+                "e_ID_CLIENTE": 24
+            }
+        ]
+
++ Response 400
+    
+        [
+            {
+                "status" : false
+                "error_code" : '400-03'
+                "error_message" : 'Error de conexion'
+            }
+        ]
+
++ Response 400
+    
+        [
+            {
+                "status" : false
+                "error_code" : '400-01'
+                "error_message" : "El parametro DOMICILIO es requerido"
+            }
+        ]
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-02'
+                "error_message" : "El parametro DOMICILIO es invalido"
+            }
+        ]
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-01'
+                "error_message" : "El parametro TIPO_SERVICIO es requerido"
+            }
+        ]
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-02'
+                "error_message" : "El parametro TIPO_SERVICIO es invalido"
+            }
+        ]
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-01'
+                "error_message" : "El parametro TELEFONO es requerido"
+            }
+        ]
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-02'
+                "error_message" : "El parametro TELEFONO es invalido"
+            }
+        ]
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-01'
+                "error_message" : "El parametro CICLO es requerido"
+            }
+        ]
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-02'
+                "error_message" : "El parametro CICLO es invalido"
+            }
+        ]    
+
+### ACTUALIZAR [POST]
+
+#### Librerias
+
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION
+- GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION
+
+#### Acciones
+ 
+- TRY
+    - GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR (INSTANCIA)
+        - INSTANCIA: PARAM.INSTANCIA
+    - GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR (NOMBRE, VALOR, OBLIGATORIO, VALIDACION, PARAMETRO)
+        - NOMBRE: 'DOMICILIO'
+        - VALOR: PARAM.DOMICILIO
+        - OBLIGATORIO: TRUE
+        - VALIDACION: 'REGEXP.TEXTO'
+        - PARAMETRO: []
+    - GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR (NOMBRE, VALOR, OBLIGATORIO, VALIDACION, PARAMETRO)
+        - NOMBRE: 'TIPO_SERVICIO'
+        - VALOR: PARAM.TIPO_SERVICIO
+        - OBLIGATORIO: TRUE
+        - VALIDACION: 'REGEXP.TEXTO'
+        - PARAMETRO: []
+    - GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR (NOMBRE, VALOR, OBLIGATORIO, VALIDACION, PARAMETRO)
+        - NOMBRE: 'TELEFONO'
+        - VALOR: PARAM.TELEFONO
+        - OBLIGATORIO: TRUE
+        - VALIDACION: 'REGEXP.TELEFONO'
+        - PARAMETRO: []
+    - GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR (NOMBRE, VALOR, OBLIGATORIO, VALIDACION, PARAMETRO)
+        - NOMBRE: 'ID_CLIENTE'
+        - VALOR: PARAM.ID_CLIENTE
+        - OBLIGATORIO: TRUE
+        - VALIDACION: 'Func.is_numeric()'
+        - PARAMETRO: []    
+    - GLOBAL_GAS.BE:C2.COMMAND.CAT.CLIENTES.ACTUALIZAR ( DOMICILIO, TIPO_SERVICIO, TELEFONO, ID_CLIENTE )    
+- CATCH
+    - SWITCH
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONEXTAR.ERROR_CONEXION'
+            - RETURN 400-03
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO'
+            - RETURN 400-01
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO'
+            - RETURN 400-02
+        - CASE 'GLOBAL_GAS.BE:C2.LIBRARY.CLIENTE.CONSTRUCTOR.TELEFONO'
+            - RETURN 402-01    
+        - DEFAULT
+            - RETURN 500
+
+#### Retorno
+
+- 200
+    - status: 'success'
+- 400-03 GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.ERROR_CONEXION
+- 400-01 GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO
+- 400-02 GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO
+
+#### Exceptiones
+
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.INSTANCIA_INEXISTENTE
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.ERROR_CONEXION
+- GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO
+- GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO
+
++ Attributes
+    - INSTANCIA
+    - DOMICILIO
+    - TIPO_SERVICIO
+    - TELEFONO 
+    - ID_CLIENTE
+
++ Response 200
+        
+        [
+            {
+                "status" : 'success'
+            }
+        ]
+
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-03'
+                "error_message" : 'Error de conexion'
+            }
+        ]
+
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-01'
+                "error_message" : "El parametro TELEFONO es requerido"
+            }
+        ]
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-02'
+                "error_message" : "El parametro TELEFONO es invalido"
+            }
+        ]
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-01'
+                "error_message" : "El parametro DOMICILIO es requerido"
+            }
+        ]
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-02'
+                "error_message" : "El parametro DOMICILIO es invalido"
+            }
+        ]
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-01'
+                "error_message" : "El parametro ID_CLIENTE es requerido"
+            }
+        ]
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-02'
+                "error_message" : "El parametro ID_CLIENTE es invalido"
+            }
+        ]    
+
+## CAT.CUENTAS [/cat.cuentas]
+
+### REPLICAR [POST]
+
+#### Comentarios 
+
+- Ejecutado por usuario desde la consola
+
+#### Librerias
+
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION
+
+#### Acciones
+ 
+- TRY
+    - GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.VALIDAR_EJECUCION_CONSOLA()
+    - GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR (INSTANCIA)
+        - INSTANCIA: PARAM.INSTANCIA
+    - GLOBAL_GAS.BE:C2.COMMAND.CAT.CUENTAS.REPLICAR ()
+- CATCH
+    - SWITCH
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.VALIDAR_EJECUCION_CONSOLA.EJECUCION_INVALIDA
+            - RETURN 400-04
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONEXTAR.ERROR_CONEXION
+            - RETURN 400-03
+        - DEFAULT
+            - RETURN 500
+
+#### Retorno
+
+- 200
+    - status: 'success'
+- 400-03 GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.ERROR_CONEXION
+- 400-04 GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.VALIDAR_EJECUCION_CONSOLA.EJECUCION_INVALIDA
+
+#### Exceptiones
+
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.INSTANCIA_INEXISTENTE
+
++ Attributes
+    - INSTANCIA    
+    
++ Response 200
+       
+        [
+            {
+                "status" : 'success'
+            }
+        ]    
+
+### AGREGAR [POST]
+
+#### Librerias
+
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION
+- GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION
+
+#### Acciones
+ 
+- TRY
+    - GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR (INSTANCIA)
+        - INSTANCIA: PARAM.INSTANCIA
+    - GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR (NOMBRE, VALOR, OBLIGATORIO, VALIDACION, PARAMETRO)
+        - NOMBRE: 'ID_CLIENTE'
+        - VALOR: PARAM.ID_CLIENTE
+        - OBLIGATORIO: TRUE
+        - VALIDACION: 'FUNC.is_numeric'
+        - PARAMETRO: []
+    - GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR (NOMBRE, VALOR, OBLIGATORIO, VALIDACION, PARAMETRO)
+        - NOMBRE: 'DOMICILIO'
+        - VALOR: PARAM.DOMICILIO
+        - OBLIGATORIO: TRUE
+        - VALIDACION: 'REGEXP.TEXTO'
+        - PARAMETRO: []
+    - GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR (NOMBRE, VALOR, OBLIGATORIO, VALIDACION, PARAMETRO)
+        - NOMBRE: 'TIPO_SERVICIO'
+        - VALOR: PARAM.TIPO_SERVICIO
+        - OBLIGATORIO: TRUE
+        - VALIDACION: 'REGEXP.TEXTO'
+        - PARAMETRO: []
+    - GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR (NOMBRE, VALOR, OBLIGATORIO, VALIDACION, PARAMETRO)
+        - NOMBRE: 'NOMBRE'
+        - VALOR: PARAM.NOMBRE
+        - OBLIGATORIO: TRUE
+        - VALIDACION: 'REGEXP.TEXTO'
+        - PARAMETRO: []    
+    - GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR (NOMBRE, VALOR, OBLIGATORIO, VALIDACION, PARAMETRO)
+        - NOMBRE: 'CICLO'
+        - VALOR: PARAM.CICLO
+        - OBLIGATORIO: TRUE
+        - VALIDACION: 'Func.is_array()'
+        - PARAMETRO: []    
+    - GLOBAL_GAS.BE:C2.COMMAND.CAT.CUENTAS.AGREGAR ( DOMICILIO, TIPO_SERVICIO, TELEFONO, NUMERO_CLIENTE, CICLO->{'TIPO', 'VALOR'}, COORDENADA->{'LATITUD', 'LONGITUD'} )    
+- CATCH
+    - SWITCH
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONEXTAR.ERROR_CONEXION'
+            - RETURN 400-03
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO'
+            - RETURN 400-01
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO'
+            - RETURN 400-02
+        - CASE 'GLOBAL_GAS.BE:C2.LIBRARY.CLIENTE.CONSTRUCTOR.TELEFONO'
+            - RETURN 402-01    
+        - DEFAULT
+            - RETURN 500
+
+#### Retorno
+
+- 200
+    - status: 'success'
+- 400-03 GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.ERROR_CONEXION
+- 400-01 GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO
+- 400-02 GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO
+
+#### Exceptiones
+
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.INSTANCIA_INEXISTENTE
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.ERROR_CONEXION
+- GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO
+- GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO
+
++ Attributes
+    - INSTANCIA
+    - ID_CLIENTE
+    - DOMICILIO
+    - NOMBRE
+    - TIPO_SERVICIO
+    - CICLO  -> TIPO, VALOR 
+    - COORDENADA -> LATITUD, LONGITUD
+
++ Response 200
+        
+        [
+            {
+                "status" : 'success'
+            }
+        ]
+
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-03'
+                "error_message" : 'Error de conexion'
+            }
+        ]
+
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-01'
+                "error_message" : "El parametro ID_CLIENTE es requerido"
+            }
+        ]
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-02'
+                "error_message" : "El parametro ID_CLIENTE es invalido"
+            }
+        ]
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-01'
+                "error_message" : "El parametro DOMICILIO es requerido"
+            }
+        ]
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-02'
+                "error_message" : "El parametro DOMICILIO es invalido"
+            }
+        ]
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-01'
+                "error_message" : "El parametro NOMBRE es requerido"
+            }
+        ]
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-02'
+                "error_message" : "El parametro NOMBRE es invalido"
+            }
+        ]
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-01'
+                "error_message" : "El parametro TIPO_SERVICIO es requerido"
+            }
+        ]    
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-02'
+                "error_message" : "El parametro TIPO_SERVICIO es invalido"
+            }
+        ]
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-01'
+                "error_message" : "El parametro CICLO es requerido"
+            }
+        ]    
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-02'
+                "error_message" : "El parametro CICLO es invalido"
+            }
+        ]    
+
+### ACTUALIZAR [POST]
+
+#### Librerias
+
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION
+- GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION
+
+#### Acciones
+ 
+- TRY
+    - GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR (INSTANCIA)
+        - INSTANCIA: PARAM.INSTANCIA
+    - GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR (NOMBRE, VALOR, OBLIGATORIO, VALIDACION, PARAMETRO)
+        - NOMBRE: 'DOMICILIO'
+        - VALOR: PARAM.DOMICILIO
+        - OBLIGATORIO: TRUE
+        - VALIDACION: 'REGEXP.TEXTO'
+        - PARAMETRO: []
+    - GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR (NOMBRE, VALOR, OBLIGATORIO, VALIDACION, PARAMETRO)
+        - NOMBRE: 'TIPO_SERVICIO'
+        - VALOR: PARAM.TIPO_SERVICIO
+        - OBLIGATORIO: TRUE
+        - VALIDACION: 'REGEXP.TEXTO'
+        - PARAMETRO: []
+    - GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR (NOMBRE, VALOR, OBLIGATORIO, VALIDACION, PARAMETRO)
+        - NOMBRE: 'NOMBRE'
+        - VALOR: PARAM.NOMBRE
+        - OBLIGATORIO: TRUE
+        - VALIDACION: 'REGEXP.TEXTO'
+        - PARAMETRO: []
+    - GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR (NOMBRE, VALOR, OBLIGATORIO, VALIDACION, PARAMETRO)
+        - NOMBRE: 'ID_CLIENTE'
+        - VALOR: PARAM.ID_CLIENTE
+        - OBLIGATORIO: TRUE
+        - VALIDACION: 'Func.is_numeric()'
+        - PARAMETRO: [] 
+    - GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR (NOMBRE, VALOR, OBLIGATORIO, VALIDACION, PARAMETRO)
+        - NOMBRE: 'ID_CUENTA'
+        - VALOR: PARAM.ID_CUENTA
+        - OBLIGATORIO: TRUE
+        - VALIDACION: 'Func.is_numeric()'
+        - PARAMETRO: []  
+    - GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR (NOMBRE, VALOR, OBLIGATORIO, VALIDACION, PARAMETRO)
+        - NOMBRE: 'CICLO'
+        - VALOR: PARAM.CICLO
+        - OBLIGATORIO: TRUE
+        - VALIDACION: 'Func.is_array()'
+        - PARAMETRO: []     
+    - GLOBAL_GAS.BE:C2.COMMAND.CAT.CUENTAS.ACTUALIZAR ( DOMICILIO, TIPO_SERVICIO, TELEFONO, ID_CLIENTE, COORDENADA->{'LONGITUD', 'LATITUD'} )    
+- CATCH
+    - SWITCH
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONEXTAR.ERROR_CONEXION'
+            - RETURN 400-03
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO'
+            - RETURN 400-01
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO'
+            - RETURN 400-02
+        - CASE 'GLOBAL_GAS.BE:C2.LIBRARY.CLIENTE.CONSTRUCTOR.TELEFONO'
+            - RETURN 402-01    
+        - DEFAULT
+            - RETURN 500
+
+#### Retorno
+
+- 200
+    - status: 'success'
+- 400-03 GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.ERROR_CONEXION
+- 400-01 GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO
+- 400-02 GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO
+
+#### Exceptiones
+
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.INSTANCIA_INEXISTENTE
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.ERROR_CONEXION
+- GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO
+- GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO
+
++ Attributes
+    - INSTANCIA
+    - DOMICILIO
+    - NOMBRE 
+    - ID_CLIENTE    
+    - ID_CUENTA
+    - CICLO -> TIPO , VALOR 
+    - COORDENADA -> LONGITUD, LATITUD
+    
++ Response 200
+        
+        [
+            {
+                "status" : 'success'
+            }
+        ]
+
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-03'
+                "error_message" : 'Error de conexion'
+            }
+        ]
+
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-01'
+                "error_message" : "El parametro ID_CLIENTE es requerido"
+            }
+        ]
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-02'
+                "error_message" : "El parametro ID_CLIENTE es invalido"
+            }
+        ]
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-01'
+                "error_message" : "El parametro DOMICILIO es requerido"
+            }
+        ]
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-02'
+                "error_message" : "El parametro DOMICILIO es invalido"
+            }
+        ]           
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-01'
+                "error_message" : "El parametro NOMBRE es requerido"
+            }
+        ]
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-02'
+                "error_message" : "El parametro NOMBRE es invalido"
+            }
+        ]
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-01'
+                "error_message" : "El parametro TIPO_SERVICIO es requerido"
+            }
+        ]    
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-02'
+                "error_message" : "El parametro TIPO_SERVICIO es invalido"
+            }
+        ]
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-01'
+                "error_message" : "El parametro CICLO es requerido"
+            }
+        ]    
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-02'
+                "error_message" : "El parametro CICLO es invalido"
+            }
+        ]       
+
+### CONSULTAR [POST]
+
+#### Librerias
+
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION
+- GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION
+
+#### Acciones
+ 
+- TRY
+    - GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR (INSTANCIA)
+        - INSTANCIA: PARAM.INSTANCIA
+    - GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR (NOMBRE, VALOR, OBLIGATORIO, VALIDACION, PARAMETRO)
+        - NOMBRE: 'ID_CLIENTE'
+        - VALOR: PARAM.ID_CLIENTE
+        - OBLIGATORIO: TRUE
+        - VALIDACION: 'Func.is_numeric()'
+        - PARAMETRO: [] 
+    - GLOBAL_GAS.BE:C2.COMMAND.CON.CUENTAS.CONSULTAR ( ID_CLIENTE )    
+- CATCH
+    - SWITCH
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONEXTAR.ERROR_CONEXION'
+            - RETURN 400-03
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO'
+            - RETURN 400-01
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO'
+            - RETURN 400-02
+        - CASE 'GLOBAL_GAS.BE:C2.LIBRARY.CLIENTE.CONSTRUCTOR.TELEFONO'
+            - RETURN 402-01    
+        - DEFAULT
+            - RETURN 500
+
+#### Retorno
+
+- 200
+    - status: 'success'
+    - m_CUENTAS = (DOMICILIO, TIPO_SERVICIO, TELEFONO, ID_CLIENTE, ID_CUENTA, CICLO->{'TIPO', 'VALOR'}, COORDENADA->{'LATITUD', 'LONGITUD'})
+- 400-03 GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.ERROR_CONEXION
+- 400-01 GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO
+- 400-02 GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO
+
+#### Exceptiones
+
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.INSTANCIA_INEXISTENTE
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.ERROR_CONEXION
+- GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO
+- GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO
+
++ Attributes
+    - ID_CLIENTE   
+
++ Response 200
+        
+        [
+            {
+                "status" : 'success',
+                "m_CUENTA" : [
+                    {
+                        "DOMICILIO" : "LIBRA 356, ZAPOPAN, JAL",
+                        "TIPO_SERVICIO" : "PORTATIL",
+                        "TELEFONO" : "3319450445",
+                        "ID_CLIENTE" : "15",
+                        "ID_CUENTA" : "78",
+                        "CICLO" : {
+                            "TIPO" : "NUMERODIAS",
+                            "VALOR" : 50
+                        },
+                        "COORDENADA" : {
+                            "LATITUD" : 20.54558,
+                            "LONGITUD" : 101.575456
+                        }
+                    }
+                ]
+            }
+        ]
+
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-01'
+                "error_message" : "El parametro ID_CLIENTE es requerido"
+            }
+        ]    
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-02'
+                "error_message" : "El parametro ID_CLIENTE es invalido"
+            }
+        ]
+
+## CAT.SERVICIOS [/cat.servicios]
+
+### AGREGAR [POST]
+
+#### Librerias
+
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION
+- GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION
+
+#### Acciones
+ 
+- TRY
+    - GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR (INSTANCIA)
+        - INSTANCIA: PARAM.INSTANCIA
+    - GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR (NOMBRE, VALOR, OBLIGATORIO, VALIDACION, PARAMETRO)
+        - NOMBRE: 'ID_CLIENTE'
+        - VALOR: PARAM.ID_CLIENTE
+        - OBLIGATORIO: TRUE
+        - VALIDACION: 'FUNC.is_numeric()'
+        - PARAMETRO: []
+    - GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR (NOMBRE, VALOR, OBLIGATORIO, VALIDACION, PARAMETRO)
+        - NOMBRE: 'ID_CUENTA'
+        - VALOR: PARAM.ID_CUENTA
+        - OBLIGATORIO: TRUE
+        - VALIDACION: 'FUNC.is_numeric()'
+        - PARAMETRO: []
+    - GLOBAL_GAS.BE:C2.COMMAND.CAT.SERVICIOS.AGREGAR ( ID_CUENTA, ID_CLIENTE )    
+- CATCH
+    - SWITCH
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONEXTAR.ERROR_CONEXION'
+            - RETURN 400-03
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO'
+            - RETURN 400-01
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO'
+            - RETURN 400-02
+        - CASE 'GLOBAL_GAS.BE:C2.LIBRARY.CLIENTE.CONSTRUCTOR.TELEFONO'
+            - RETURN 402-01    
+        - DEFAULT
+            - RETURN 500
+
+#### Retorno
+
+- 200
+    - status: 'success'
+- 400-03 GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.ERROR_CONEXION
+- 400-01 GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO
+- 400-02 GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO
+
+#### Exceptiones
+
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.INSTANCIA_INEXISTENTE
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.ERROR_CONEXION
+- GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO
+- GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO
+
++ Attributes
+    - INSTANCIA
+    - ID_CLIENTE
+    - ID_CUENTA
+    
++ Response 200
+        
+        [
+            {
+                "status" : 'success'
+            }
+        ]
+
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-01'
+                "error_message" : "El parametro ID_CLIENTE es requerido"
+            }
+        ]    
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-02'
+                "error_message" : "El parametro ID_CLIENTE es invalido"
+            }
+        ]    
+
+### CANCELAR [POST]
+
+#### Librerias
+
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION
+- GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION
+
+#### Acciones
+ 
+- TRY
+    - GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR (INSTANCIA)
+        - INSTANCIA: PARAM.INSTANCIA
+    - GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR (NOMBRE, VALOR, OBLIGATORIO, VALIDACION, PARAMETRO)
+        - NOMBRE: 'ID_CLIENTE'
+        - VALOR: PARAM.ID_CLIENTE
+        - OBLIGATORIO: TRUE
+        - VALIDACION: 'FUNC.is_numeric()'
+        - PARAMETRO: []
+    - GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR (NOMBRE, VALOR, OBLIGATORIO, VALIDACION, PARAMETRO)
+        - NOMBRE: 'ID_CUENTA'
+        - VALOR: PARAM.ID_CUENTA
+        - OBLIGATORIO: TRUE
+        - VALIDACION: 'FUNC.is_numeric()'
+        - PARAMETRO: []
+    - GLOBAL_GAS.BE:C2.COMMAND.CAT.SERVICIOS.CANCELAR ( ID_CLIENTE, ID_CUENTA) 
+- CATCH
+    - SWITCH
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONEXTAR.ERROR_CONEXION'
+            - RETURN 400-03
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO'
+            - RETURN 400-01
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO'
+            - RETURN 400-02
+        - CASE 'GLOBAL_GAS.BE:C2.LIBRARY.CLIENTE.CONSTRUCTOR.TELEFONO'
+            - RETURN 402-01    
+        - DEFAULT
+            - RETURN 500
+
+#### Retorno
+
+- 200
+    - status: 'success'
+- 400-03 GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.ERROR_CONEXION
+- 400-01 GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO
+- 400-02 GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO
+
+#### Exceptiones
+
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.INSTANCIA_INEXISTENTE
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.ERROR_CONEXION
+- GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO
+- GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO
+
++ Attributes
+    - INSTANCIA
+    - ID_CLIENTE
+    - ID_CUENTA
+    - ID_SERVICIO
+    - RAZON_CANCELACION       
+
++ Response 200
+        
+        [
+            {
+                "status" : 'success'
+            }
+        ]
+
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-01'
+                "error_message" : "El parametro ID_CLIENTE es requerido"
+            }
+        ]    
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-02'
+                "error_message" : "El parametro ID_CLIENTE es invalido"
+            }
+        ]  
+        
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-01'
+                "error_message" : "El parametro ID_CUENTA es requerido"
+            }
+        ]    
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-02'
+                "error_message" : "El parametro ID_CUENTA es invalido"
+            }
+        ]          
+
+### CONSULTAR [POST]
+
+#### Librerias
+
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION
+- GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION
+
+#### Acciones
+ 
+- TRY
+    - GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR (INSTANCIA)
+        - INSTANCIA: PARAM.INSTANCIA
+    - GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR (NOMBRE, VALOR, OBLIGATORIO, VALIDACION, PARAMETRO)
+        - NOMBRE: 'ID_CLIENTE'
+        - VALOR: PARAM.ID_CLIENTE
+        - OBLIGATORIO: TRUE
+        - VALIDACION: 'FUNC.is_numeric()'
+        - PARAMETRO: []
+    - GLOBAL_GAS.BE:C2.COMMAND.CON.SERVICIOS.HISTORIAL ( ID_CLIENTE, ID_CUENTA, ID_SERVICIO) 
+- CATCH
+    - SWITCH
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONEXTAR.ERROR_CONEXION'
+            - RETURN 400-03
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO'
+            - RETURN 400-01
+        - CASE 'GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO'
+            - RETURN 400-02
+        - CASE 'GLOBAL_GAS.BE:C2.LIBRARY.CLIENTE.CONSTRUCTOR.TELEFONO'
+            - RETURN 402-01    
+        - DEFAULT
+            - RETURN 500
+
+#### Retorno
+
+- 200
+    - status: 'success'
+    - m_SERVICIOS: ( FECHA, TIPO_SERVICIO, ID_SERVICIO, ID_CUENTA, DOMICILIO, ESTADO, DETALLE )
+- 400-03 GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.ERROR_CONEXION
+- 400-01 GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO
+- 400-02 GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO
+
+#### Exceptiones
+
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.INSTANCIA_INEXISTENTE
+- GLOBAL_GAS.BE:C1.LIBRARY.CONEXION.CONECTAR.ERROR_CONEXION
+- GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.OBLIGATORIO
+- GLOBAL_GAS.BE:C1.LIBRARY.VALIDACION.VALIDAR.INVALIDO
+
++ Attributes
+    - INSTANCIA
+    - ID_CLIENTE    
+    
++ Response 200
+        
+        [
+            {
+                "status" : 'success',
+                "m_SERVICIOS" : [
+                    {
+                        "FECHA": "2018-05-07 15:00:00",
+                        "ID_SERVICIO" : "154",
+                        "ID_CUENTA" : "259",
+                        "DOMICILIO" : "LIBRA 356, ZAPOPAN, JAL",
+                        "ESTADO" : "VIGENTE",
+                        "DETALLE" : {
+                            "CILINDRO_10" : 1,
+                            "CILINDRO_20" : 2,
+                            "CILINDRO_30" : 4,
+                            "CILINDRO_45" : 9
+                        }
+                    }
+                ]
+            }
+        ]
+
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-01'
+                "error_message" : "El parametro ID_CLIENTE es requerido"
+            }
+        ]    
+    
++ Response 400
+        
+        [
+            {
+                "status" : false
+                "error_code" : '400-02'
+                "error_message" : "El parametro ID_CLIENTE es invalido"
+            }
+        ]     
