@@ -68,11 +68,27 @@ HOST: http://polls.apiblueprint.org/
 + Attributes
     - e_CLIENTE_ID
     - ID_GLOBALNET
+
+### OBTENER_JWT[POST]
+
+#### Acciones
+
+- INSERT INTO seg_sesiones
+    - SES_EMPLEADO: PARAM.CLI_ID
+    - SES_SESION: Genera un codigo REGEX.SESION
+    - SES_VIGENCIA: date() + 1 dia
+    - SES_SECRET: Genera un codigo REGEX.APIKEY
+- e_HEADER = '{"alg":"HS256","typ":"JWT"}'
+- e_PAYLOAD = '{"e":"CLI_ID","s":"SES_SESION"}'    
+- e_JWT: base64_encode(e_HEADER) . "." . base64_encode(e_PAYLOAD) . "." 
+    . base64_encode(hash_hmac('sha256', base64_encode(e_HEADER) . "." . base64_encode(e_PAYLOAD), SES_SECRET, true))
+- RETURN 
+    - e_JWT
     
     
 ## DB.CAT_CLIENTES_ACCESOS [/db.cat_clientes_accesos]
 
-### GENERAR_APIKEY
+### GENERAR_APIKEY[POST]
 
 #### Acciones
 
@@ -86,7 +102,7 @@ HOST: http://polls.apiblueprint.org/
 
 #### Retorno
 
-- N/A
+- APIKEY
 
 + Attributes
     - TELEFONO
