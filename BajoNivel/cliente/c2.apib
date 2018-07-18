@@ -42,8 +42,7 @@ HOST: http://polls.apiblueprint.org/
 
 #### Retorno
 
-- N/A
-- TROW 402-01
+- APIKEY
 
 + Attribute
     - TELEFONO
@@ -60,21 +59,17 @@ HOST: http://polls.apiblueprint.org/
     - o_CLIENTE = NEW CLIENTE ( TELEFONO, NUMERO_CUENTA )
         - TELEFONO : PARAM.TELEFONO
         - NUMERO_CUENTA : PARAM.NUMERO_CUENTA
-    GLOBAL_GAS.B3:C3.STEP.CAT.CLIENTES.ACTUALIZAR_VIGENCIA ( CLIENTE.ID_CLIENTE )
+    - o_CLIENTE.VALIDAR_APIKEY( APIKEY )
+        - APIKEY : PARAM.APIKEY  
+    - e_JWT = GLOBAL_GAS.B3:C3.STEP.CAT.CLIENTES.OBTENER_JWT ( CLIENTE.ID_CLIENTE )
 - CATCH
     - RETROW
 
-- RETURN m_CLIENTE 
-    - ID_CLIENTE : o_CLIENTE.ID_CLIENTE
-    - EDICION : o_CLIENTE.EDICION
-    - NUMERO_CUENTA : o_CLIENTE.NUMERO_CUENTA
+- RETURN e_JWT
 
 #### Retorno
 
-- o_CLIENTE
-    - ID_CLIENTE
-    - EDICION
-    - NUMERO_CUENTA
+- e_JWT
 
 + Attribute
     - TELEFONO
@@ -85,16 +80,16 @@ HOST: http://polls.apiblueprint.org/
 #### Acciones
 
 - TRY
-    - m_CLIENTE = GLOBAL_GAS.B3:C3.STEP.CAT.CLIENTES.VALIDAR_CODIGO ( TELEFONO, CODIGO )
-    - TELEFONO : PARAM.TELEFONO
-    - CODIGO : PARAM.CODIGO
+    - e_JWT = GLOBAL_GAS.B3:C3.STEP.CAT.CLIENTES.VALIDAR_CODIGO ( TELEFONO, CODIGO, APIKEY )
+        - TELEFONO : PARAM.TELEFONO
+        - CODIGO : PARAM.CODIGO
+        - APIKEY : PARAM.APIKEY
 - CATCH
     - RETROW
-- IF ( CLI_ID IS ARRAY ) 
+- IF ( e_JWT != TRUE ) 
     RETURN STATUS
         - REGISTRO : FALSE
-        - ID_CLIENTE : m_CLIENTE.ID_CLIENTE
-        - NUMERO_CUENTA : m_CLIENTE.NUMERO_CUENTA
+        - e_JWT
 - ELSE
     RETURN STATUS
         - REGISTRO = TRUE
@@ -102,9 +97,8 @@ HOST: http://polls.apiblueprint.org/
 #### Retorno
 
 - m_STATUS
-    - REGISTRO : TRUE /FALSE
-    - ID_CLIENTE : NUMERIC / NULL
-    - NUMERO_CUENTA : NUMERIC / NULL
+    - REGISTRO : TRUE / FALSE
+    - e_JWT : 'iksbcjsbdjvcbjsdbcbsubvihvsdb'
 
 + Attribute
     - TELEFONO
@@ -119,7 +113,7 @@ HOST: http://polls.apiblueprint.org/
         - NOMBRE : PARAM.NOMBRE
         - TELEFONO : PARAM.TELEFONO
         - DOMICLIO : PARAM.DOMICILIO
-    - GLOBAL_GAS.BE:C3.STEP.CAT.CUENTAS.AGREGAR ( DOMICILIO, TIPO_SERVICIO, TELEFONO, CLIENTE, CICLO )
+    - e_JWT = GLOBAL_GAS.BE:C3.STEP.CAT.CUENTAS.AGREGAR ( DOMICILIO, TIPO_SERVICIO, TELEFONO, CLIENTE, CICLO )
         - DOMICILIO : PARAM.DOMICILIO
         - TIPO_SERVICIO : PARAM.TIPO_SERVICIO
         - TELEFONO : PARAM.TELEFONO
@@ -130,7 +124,7 @@ HOST: http://polls.apiblueprint.org/
 
 #### Retorno
 
-- N/A
+- e_JWT
 
 + Attribute
     - NOMBRE
@@ -140,7 +134,29 @@ HOST: http://polls.apiblueprint.org/
     - CLIENTE
     - CICLO
 
-## CAT.CLIENTES [/cat.cuentas]    
+## CAT.CLIENTES.ACCESOS
+
+### OBTENER.APIKEY [POST]
+
+#### Acciones
+
+- TRY
+    - IF QUERY - SELECT ID_CLIENTE FROM cat_clientes WHERE TELEFONO = PARAM.TELEFONO AND NOMBRE != APP
+        - TROW 402-01
+    - ELSE
+        - e_APIKEY = GLOBAL_GAS.BE:C3.STEP.CAT.CLIENTES_ACCESOS.GENERAR_APIKEY ( TELEFONO )
+            - TELEFONO : PARAM.TELEFONO
+- CATCH
+    - RETROW
+
+#### Retorno
+
+- e_APIKEY
+
++ Attribute
+    - TELEFONO
+
+## CAT.CUENTAS [/cat.cuentas]    
 
 ### AGREGAR[POST]
 
