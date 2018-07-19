@@ -24,6 +24,8 @@ HOST: http://polls.apiblueprint.org/
     - CLI_FECHA_ULTIMA_MODIFICACION: PARAM.FECHA_ULTIMA_MODIFICACION
     - CLI_TELEFONO: PARAM.TELEFONO
     - CLI_DOMICILIO: PARAM.DOMICILIO
+    - CLI_NOMBRE: PARAM.NOMBRE
+    - CLI_NUMERO: PARAM.NUMERO
 
 #### Retorno
 
@@ -42,7 +44,10 @@ HOST: http://polls.apiblueprint.org/
 
 - UPDATE cat_clientes WHERE CLI_ID=e_ID
     - CLI_FECHA_ULTIMA_MODIFICACION: PARAM.FECHA_ULTIMA_MODIFICACION
-    - CLI_FECHA_DOMICILIO: PARAM.DOMICILIO
+    - CLI_TELEFONO: PARAM.TELEFONO
+    - CLI_DOMICILIO: PARAM.DOMICILIO
+    - CLI_NOMBRE: PARAM.NOMBRE
+    - CLI_NUMERO: PARAM.NUMERO
 
 #### Retorno
 
@@ -59,6 +64,7 @@ HOST: http://polls.apiblueprint.org/
 
 - UPDATE cat_clientes WHERE CLI_ID = e_CLIENTE_ID AND CLI_ID = ID_GLOBALNET
     - CLI_ID_GLOBALNET : PARAM.ID_GLOBALNET
+    - CLI_NUMERO : PARAM.NUMERO
 - RETURN TRUE    
 
 #### Retorno
@@ -68,11 +74,34 @@ HOST: http://polls.apiblueprint.org/
 + Attributes
     - e_CLIENTE_ID
     - ID_GLOBALNET
+
+### OBTENER_JWT[POST]
+
+#### Acciones
+
+- INSERT INTO seg_sesiones
+    - SES_EMPLEADO: PARAM.CLIENTE_ID
+    - SES_SESION: Genera un codigo REGEX.SESION
+    - SES_VIGENCIA: date() + 1 dia
+    - SES_SECRET: Genera un codigo REGEX.APIKEY
+- e_HEADER = '{"alg":"HS256","typ":"JWT"}'
+- e_PAYLOAD = '{"e":"CLI_ID","s":"SES_SESION"}'    
+- e_JWT: base64_encode(e_HEADER) . "." . base64_encode(e_PAYLOAD) . "." 
+    . base64_encode(hash_hmac('sha256', base64_encode(e_HEADER) . "." . base64_encode(e_PAYLOAD), SES_SECRET, true))
+- RETURN 
+    - e_JWT
+
+#### Retorno
+
+- e_JWT
+
++ Attributes
+    - CLIENTE_ID
     
     
 ## DB.CAT_CLIENTES_ACCESOS [/db.cat_clientes_accesos]
 
-### GENERAR_APIKEY
+### GENERAR_APIKEY[POST]
 
 #### Acciones
 
@@ -86,7 +115,7 @@ HOST: http://polls.apiblueprint.org/
 
 #### Retorno
 
-- N/A
+- APIKEY
 
 + Attributes
     - TELEFONO
@@ -252,7 +281,18 @@ HOST: http://polls.apiblueprint.org/
 
 - UPDATE dat_servicios WHERE SER_ID=SER_ID_GLOBALNET AND SER_ID=e_ID_SER
     - SER_ID_GLOBALNET: PARAM.ID_GLOBALNET
-    - SER_ESTADO : 'ACTIVO'
+    - SER_FECHA_ULTIMA_MODIFICACION: PARAM.FECHA_ULTIMA_MODIFICACION
+    - SER_CLIENTE: PARAM.CLIENTE
+    - SER_CUENTA: PARAM.CUENTA
+    - SER_CUENTA_OCULTA: PARAM.CUENTA_OCULTA
+    - SER_ID_GLOBALNET_UNIDAD: PARAM.ID_GLOBALNET_UNIDAD
+    - SER_TIPO_SERVICIO: PARAM.TIPO_SERVICIO
+    - SER_FECHA_PROGRAMADO: PARAM.FECHA_PROGRAMADO
+    - SER_ESTATUS: PARAM.ESTATUS
+    - SER_DOMICILIO: json_encode(PARAM.DOMICILIO)
+    - SER_INDICE: PARAM.INDICE
+    - SER_DESCUENTO: PARAM.DESCUENTO
+    - SER_APLICA_DESCUENTO: PARAM.APLICA_DESCUENTO
 
 #### Retorno    
     
@@ -261,7 +301,3 @@ HOST: http://polls.apiblueprint.org/
 + Attributes
     - ID_GLOBALNET
     - e_ID_SER
-    
-    
-    
-    
