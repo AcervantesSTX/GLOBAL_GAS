@@ -114,7 +114,8 @@ HOST: http://polls.apiblueprint.org/
 
 + Attribute
     - TELEFONO
-    - CODIGO   
+    - CODIGO
+    - APIKEY   
 
 ### AGREGAR[POST]
 
@@ -180,6 +181,10 @@ HOST: http://polls.apiblueprint.org/
 
 ### AGREGAR[POST]
 
+#### Libreria
+
+- GLOBAL_GAS.BE:C2.LIBRARY.CLIENTES
+
 #### Acciones
 
 - TRY
@@ -210,6 +215,10 @@ HOST: http://polls.apiblueprint.org/
     - SESION
 
 ### ACTUALIZAR[POST]
+
+#### Librarie
+
+- GLOBAL_GAS.BE:C2.LIBRARY.CLIENTES
 
 #### Acciones
 
@@ -380,5 +389,6 @@ HOST: http://polls.apiblueprint.org/
 + Attribute
     - ID_CLIENTE
     - ID_CUENTA
+    - ESTADO
     - DETALLES
     - SESION    
